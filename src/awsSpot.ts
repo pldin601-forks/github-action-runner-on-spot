@@ -67,7 +67,7 @@ export class awsSpotClient implements AWSSpotWorker {
   }
 
   async describeSpot(spotReqId: string): Promise<string | undefined> {
-    return new Promise((resolve, reject) => {
+    return await new Promise((resolve, reject) => {
       const params = {
         SpotInstanceRequestIds: [spotReqId]
       }
@@ -143,7 +143,8 @@ export class awsSpotClient implements AWSSpotWorker {
             : ''
         core.info(`SpotReqID is  ${spotReqID}`)
         core.setOutput('ec2-spot-request-id', spotReqID)
-        const data = await await this.describeSpot(spotReqID)
+        await delay(15 * 1000)
+        const data = await this.describeSpot(spotReqID)
         core.info(`DescribeSpot: AWS EC2 instance is  ${data}`)
         if (data !== undefined) {
           const instanceId = data
@@ -173,7 +174,7 @@ export class awsSpotClient implements AWSSpotWorker {
   async requestSpot(
     request: AWS.EC2.RequestSpotInstancesRequest
   ): Promise<AWS.EC2.RequestSpotInstancesResult | undefined> {
-    return new Promise((resolve, reject) => {
+    return await new Promise((resolve, reject) => {
       this.ec2.requestSpotInstances(request, function (error, data) {
         if (error) {
           core.error(`AWS Spot EC2 instance starting error: ${error}`)
