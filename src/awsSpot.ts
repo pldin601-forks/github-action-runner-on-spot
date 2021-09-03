@@ -143,7 +143,7 @@ export class awsSpotClient implements AWSSpotWorker {
             : ''
         core.info(`SpotReqID is  ${spotReqID}`)
         core.setOutput('ec2-spot-request-id', spotReqID)
-        const data = await this.describeSpot(spotReqID)
+        const data = await await this.describeSpot(spotReqID)
         core.info(`DescribeSpot: AWS EC2 instance is  ${data}`)
         if (data !== undefined) {
           const instanceId = data
