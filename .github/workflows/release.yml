@@ -35,7 +35,7 @@ jobs:
         run: npm ci --ignore-scripts
       - name: Run build
         run: npm run all
-      - uses: "marvinpinto/action-automatic-releases@latest"
+      - uses: "restreamio/github-action-release@latest"
         with:
           repo_token: "${{ secrets.TOKEN }}"
           automatic_release_tag: "latest"
