@@ -161,9 +161,11 @@ export class awsSpotClient implements AWSSpotWorker {
           this.ec2.createTags()
         } else {
           core.info(`DescribeSpot: AWS EC2 instance is  undefined`)
+          //TODO start on-demand
         }
         return spotReqID
       }
+      //TODO start on-demand
       core.error('AWS EC2 spot instance request is undefined')
       throw new Error('ec2SpotInstanceRequest is undefined')
     } catch (error) {

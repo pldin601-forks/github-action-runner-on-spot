@@ -24,8 +24,8 @@ async function run(): Promise<void> {
       default:
         throw new Error('Wrong mode. Allowed values: start, stop.')
     }
-  } catch (error) {
-    core.setFailed(error.message)
+  } catch (err) {
+    core.setFailed(`error: ${err}`)
   }
 }
 
