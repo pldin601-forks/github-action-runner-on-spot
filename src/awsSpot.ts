@@ -102,7 +102,7 @@ export class awsSpotClient implements AWSSpotWorker {
       const result = await this.ec2
         .describeSpotPriceHistory(paramsSpot)
         .promise()
-      let maxPrice = 0
+      let maxPrice: number = 0
 
       for (const item of result.SpotPriceHistory!) {
         const price: number = +item.SpotPrice!
@@ -110,6 +110,7 @@ export class awsSpotClient implements AWSSpotWorker {
           maxPrice = price
         }
       }
+      maxPrice += 0.01
       return `${maxPrice}`
     } catch (error) {
       core.error(`AWS EC2 Spot instance price history has error`)
