@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
+import { genLabel, startRunner, stopRunner } from './cmd'
 import { IEC2Params } from './interfaces'
-import { startRunner, stopRunner, genLabel } from './cmd'
 
 async function run(): Promise<void> {
   try {
@@ -36,6 +36,7 @@ async function prepareStart(): Promise<void> {
   if (!awsRegion) {
     awsRegion = 'us-east1'
   }
+  // eslint-disable-next-line i18n-text/no-en
   core.info('Mode Start:')
   const params: IEC2Params = {
     ec2ImageId: core.getInput('ec2-image-id'),
@@ -74,6 +75,7 @@ async function prepareStart(): Promise<void> {
 }
 
 async function prepeareStop(): Promise<void> {
+  // eslint-disable-next-line i18n-text/no-en
   core.info('Mode Stop:')
   const label = core.getInput('label')
   const ec2InstanceId = core.getInput('ec2-instance-id')

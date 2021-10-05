@@ -1,13 +1,13 @@
-import AWS from 'aws-sdk'
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import {
-  TagSpecificationList,
-  TagSpecification,
-  TagList,
-  Tag
-} from 'aws-sdk/clients/ec2'
 import { AWSWorker, IEC2Params } from './interfaces'
+import {
+  Tag,
+  TagList,
+  TagSpecification,
+  TagSpecificationList
+} from 'aws-sdk/clients/ec2'
+import AWS from 'aws-sdk'
 
 export class awsClient implements AWSWorker {
   ec2: AWS.EC2
@@ -25,6 +25,7 @@ export class awsClient implements AWSWorker {
   }
 
   async terminateInstance(): Promise<void> {
+    // eslint-disable-next-line i18n-text/no-en
     core.info('Treminate EC2 Instance')
     if (this.params.instanceId === undefined) {
       core.error('AWS EC2 instance ID is undefined')
@@ -47,21 +48,27 @@ export class awsClient implements AWSWorker {
     core.info(`Userdata: with label ${this.params.label}`)
     const userData = this.getUserData()
     const Ec2Params = {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       ImageId: this.params.ec2ImageId!,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       InstanceType: this.params.ec2InstanceType!,
       MinCount: 1,
       MaxCount: 1,
       UserData: Buffer.from(userData.join('\n')).toString('base64'),
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       SubnetId: this.params.subnetId!,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       SecurityGroupIds: [this.params.securityGroupId!],
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       IamInstanceProfile: { Name: this.params.iamRoleName! },
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       TagSpecifications: getTagSpecification(this.params.tags!)
     }
 
     try {
       const result = await this.ec2.runInstances(Ec2Params).promise()
       core.info('Ec2 runInstances is started')
-      const ec2InstanceId = result.Instances![0].InstanceId
+      const ec2InstanceId = result.Instances?.[0].InstanceId
       this.params.ec2ImageId = ec2InstanceId
       core.info(`AWS EC2 instance ${ec2InstanceId} is started`)
       if (ec2InstanceId === undefined) {

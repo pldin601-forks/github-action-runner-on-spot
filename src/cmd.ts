@@ -1,8 +1,8 @@
-import { IEC2Params } from './interfaces'
 import * as core from '@actions/core'
-import { gitHubClient } from './github'
+import { IEC2Params } from './interfaces'
 import { awsClient } from './aws'
-import { awsSpotClient } from './awsSpot'
+import { awsSpotClient } from './aws_spot'
+import { gitHubClient } from './github'
 
 export function genLabel(): string {
   return Math.random().toString(36).substr(2, 5)
@@ -11,12 +11,14 @@ export function genLabel(): string {
 export async function startRunner(
   token: string,
   params: IEC2Params
-): Promise<string> {
+): Promise<String | string | undefined> {
+  // eslint-disable-next-line i18n-text/no-en
   core.info(`Mode Start: start runner with label ${params.label}`)
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const ghc = new gitHubClient(token, params.label!)
   const ghToken = await ghc.getRegistrationToken()
 
-  let ec2InstanceId: string | Promise<string>
+  let ec2InstanceId: String | undefined | Promise<string>
   if (params.runnerType === 'spot') {
     const aws = new awsSpotClient(params, ghToken)
     const spotPrice = await aws.getSpotPrice()
@@ -40,6 +42,7 @@ export async function stopRunner(
   requestID: string,
   spot: boolean
 ): Promise<void> {
+  // eslint-disable-next-line i18n-text/no-en
   core.info('Mode Stop: stop runner')
 
   const params: IEC2Params = {
