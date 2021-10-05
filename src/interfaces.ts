@@ -28,10 +28,11 @@ export interface AWSWorker extends Worker {
 }
 
 export interface AWSSpotWorker {
-  describeSpot(spotReqId: string): Promise<string | undefined>
+  describeSpot(spotReqId: string[] | undefined): Promise<string | undefined>
   getOnDemandPrice(): Promise<string>
   getSpotPrice(): Promise<string>
-  startEc2SpotInstance(spotPrice: string): Promise<string>
+
+  startEc2SpotInstance(spotPrice: string): Promise<String | undefined>
   requestSpot(
     request: AWS.EC2.RequestSpotInstancesRequest
   ): Promise<AWS.EC2.RequestSpotInstancesResult | undefined>

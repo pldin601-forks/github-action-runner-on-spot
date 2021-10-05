@@ -1,7 +1,7 @@
-import * as github from '@actions/github'
 import * as core from '@actions/core'
-import _ from 'lodash'
+import * as github from '@actions/github'
 import { GitHubWorker } from './interfaces'
+import _ from 'lodash'
 
 export class gitHubClient implements GitHubWorker {
   /* eslint-disable  @typescript-eslint/no-explicit-any */
@@ -36,6 +36,7 @@ export class gitHubClient implements GitHubWorker {
 
   async getRunner(): Promise<null | any> {
     core.info(
+      // eslint-disable-next-line i18n-text/no-en
       `Get Github runner info  with label  ${this.label}  from ${this.owner}/${this.repo}`
     )
     const octokit = github.getOctokit(this.token)
@@ -52,6 +53,7 @@ export class gitHubClient implements GitHubWorker {
   }
 
   async removeRunner(): Promise<void> {
+    // eslint-disable-next-line i18n-text/no-en
     core.info('Remove Github runner ')
     const runner = await this.getRunner()
     if (!runner) {
@@ -78,6 +80,7 @@ export class gitHubClient implements GitHubWorker {
   }
 
   async waitForRunnerRegistered(): Promise<void> {
+    // eslint-disable-next-line i18n-text/no-en
     core.info('Waiting for registration Github runner')
     const timeoutMinutes = 5
     const retryIntervalSeconds = 10
@@ -85,10 +88,12 @@ export class gitHubClient implements GitHubWorker {
     let waitSeconds = 0
 
     core.info(
+      // eslint-disable-next-line i18n-text/no-en
       `Waiting ${quietPeriodSeconds}s for the AWS EC2 instance to be registered in GitHub as a new self-hosted runner`
     )
     await new Promise(r => setTimeout(r, quietPeriodSeconds * 1000))
     core.info(
+      // eslint-disable-next-line i18n-text/no-en
       `Checking every ${retryIntervalSeconds}s if the GitHub self-hosted runner is registered`
     )
 

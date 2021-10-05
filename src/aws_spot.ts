@@ -1,16 +1,17 @@
-import AWS from 'aws-sdk'
+// eslint-disable-next-line filenames/match-regex
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import {
-  TagSpecificationList,
-  TagSpecification,
-  TagList,
-  Tag,
-  CancelSpotInstanceRequestsRequest
-} from 'aws-sdk/clients/ec2'
 import { AWSSpotWorker, IEC2Params } from './interfaces'
-import { onDemandPriceDB } from './ondemand'
+import {
+  CancelSpotInstanceRequestsRequest,
+  Tag,
+  TagList,
+  TagSpecification,
+  TagSpecificationList
+} from 'aws-sdk/clients/ec2'
+import AWS from 'aws-sdk'
 import { delay } from './cmd'
+import { onDemandPriceDB } from './ondemand'
 
 export class awsSpotClient implements AWSSpotWorker {
   ec2: AWS.EC2
@@ -28,13 +29,16 @@ export class awsSpotClient implements AWSSpotWorker {
   }
 
   async terminateInstance(): Promise<void> {
+    // eslint-disable-next-line i18n-text/no-en
     core.info('Terminate Spot Instance')
     if (this.params.instanceId === undefined) {
       core.error('AWS Spot request ID is undefined')
       throw new Error('ec2SpotRequestId is undefined')
     }
 
-    const data = await this.describeSpot(this.params.instanceId)
+    const spotParam: string[] = []
+    spotParam.push(this.params.instanceId)
+    const data = await this.describeSpot(spotParam)
     let instanceId = ''
     if (data !== undefined) {
       instanceId = data
@@ -66,17 +70,19 @@ export class awsSpotClient implements AWSSpotWorker {
     }
   }
 
-  async describeSpot(spotReqId: string): Promise<string | undefined> {
+  async describeSpot(
+    spotReqId: string[] | undefined
+  ): Promise<string | undefined> {
     return await new Promise((resolve, reject) => {
       const params = {
-        SpotInstanceRequestIds: [spotReqId]
+        SpotInstanceRequestIds: spotReqId
       }
       this.ec2.describeSpotInstanceRequests(params, function (error, data) {
         if (error) {
           core.error(`AWS Describe Spot EC2 instance error: ${error}`)
           reject(error)
         }
-        resolve(data.SpotInstanceRequests![0].InstanceId)
+        resolve(data.SpotInstanceRequests?.[0].InstanceId)
       })
     })
   }
@@ -93,6 +99,7 @@ export class awsSpotClient implements AWSSpotWorker {
     const end = new Date(Date.now())
     const start = new Date(end.getTime() - 30 * 60 * 1000)
     const paramsSpot = {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       InstanceTypes: [this.params.ec2InstanceType!],
       ProductDescriptions: ['Linux/UNIX (Amazon VPC)'],
       StartTime: start,
@@ -102,9 +109,11 @@ export class awsSpotClient implements AWSSpotWorker {
       const result = await this.ec2
         .describeSpotPriceHistory(paramsSpot)
         .promise()
-      let maxPrice: number = 0
+      let maxPrice = 0
 
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       for (const item of result.SpotPriceHistory!) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const price: number = +item.SpotPrice!
         if (price > maxPrice) {
           maxPrice = price
@@ -118,39 +127,47 @@ export class awsSpotClient implements AWSSpotWorker {
     }
   }
 
-  async startEc2SpotInstance(spotPrice: string): Promise<string> {
+  async startEc2SpotInstance(spotPrice: string): Promise<String | undefined> {
     try {
       const request: AWS.EC2.RequestSpotInstancesRequest = {
         SpotPrice: spotPrice,
         InstanceCount: this.params.runnerCount,
         Type: 'one-time',
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         TagSpecifications: getTagSpecification(this.params.tags!, true)
       }
 
       const userData = this.getUserData()
       request.LaunchSpecification = {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         ImageId: this.params.ec2ImageId!,
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         InstanceType: this.params.ec2InstanceType!,
         UserData: Buffer.from(userData.join('\n')).toString('base64'),
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         SubnetId: this.params.subnetId!,
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         SecurityGroupIds: [this.params.securityGroupId!],
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         IamInstanceProfile: { Name: this.params.iamRoleName! }
       }
       const spotReq = await this.requestSpot(request)
       if (spotReq !== undefined) {
         const spotReqID =
-          spotReq.SpotInstanceRequests![0].SpotInstanceRequestId !== undefined
-            ? spotReq.SpotInstanceRequests![0].SpotInstanceRequestId
+          spotReq.SpotInstanceRequests?.[0].SpotInstanceRequestId !== undefined
+            ? spotReq.SpotInstanceRequests?.[0].SpotInstanceRequestId
             : ''
         core.info(`SpotReqID is  ${spotReqID}`)
         core.setOutput('ec2-spot-request-id', spotReqID)
         await delay(15 * 1000)
-        const data = await this.describeSpot(spotReqID)
+        const spotParam: string[] = []
+        spotParam.push(spotReqID)
+        const data = await this.describeSpot(spotParam)
         core.info(`DescribeSpot: AWS EC2 instance is  ${data}`)
         if (data !== undefined) {
-          const instanceId = data
           const params = {
-            Resources: [instanceId],
+            Resources: [data],
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             Tags: getTags(this.params.tags!)
           }
           this.ec2.createTags(params, function (err, dataTags) {
@@ -198,8 +215,8 @@ export class awsSpotClient implements AWSSpotWorker {
     }
 
     const SpotInstanceRequestId =
-      spotResult.SpotInstanceRequests![0].SpotInstanceRequestId !== undefined
-        ? spotResult.SpotInstanceRequests![0].SpotInstanceRequestId
+      spotResult.SpotInstanceRequests?.[0].SpotInstanceRequestId !== undefined
+        ? spotResult.SpotInstanceRequests[0].SpotInstanceRequestId
         : ''
 
     const params = {
@@ -213,7 +230,7 @@ export class awsSpotClient implements AWSSpotWorker {
           core.error(`AWS Spot EC2 instance starting error: ${error}`)
           throw new Error('ec2SpotInstanceRequest ${error}')
         }
-        if (data.SpotInstanceRequests![0].State === `active`) {
+        if (data.SpotInstanceRequests?.[0].State === `active`) {
           exit = true
           return
         }
