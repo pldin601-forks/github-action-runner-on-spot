@@ -11,9 +11,11 @@ export function genLabel(): string {
 export async function startRunner(
   token: string,
   params: IEC2Params
-): Promise<String | string | undefined> {
-  // eslint-disable-next-line i18n-text/no-en
-  core.info(`Mode Start: start runner with label ${params.label}`)
+): Promise<void> {
+  core.info(
+    // eslint-disable-next-line i18n-text/no-en
+    `Mode Start: start runner with label ${params.label} and type ${params.runnerType}`
+  )
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const ghc = new gitHubClient(token, params.label!)
   const ghToken = await ghc.getRegistrationToken()
@@ -24,16 +26,33 @@ export async function startRunner(
     const spotPrice = await aws.getSpotPrice()
     const ondemandPrice = await aws.getOnDemandPrice()
     core.info(`SpotPrice: ${spotPrice}`)
-    ec2InstanceId =
-      ondemandPrice > spotPrice
-        ? await aws.startEc2SpotInstance(spotPrice)
-        : startOnDemand(params, ghToken)
+    core.info(`On-demandPrice: ${ondemandPrice}`)
+    if (parseInt(ondemandPrice) > parseInt(spotPrice)) {
+      // eslint-disable-next-line i18n-text/no-en
+      core.info(`Start on-demand instance`)
+      ec2InstanceId = startOnDemand(params, ghToken)
+      params.runnerType = 'ondemand'
+    } else {
+      // eslint-disable-next-line i18n-text/no-en
+      core.info(`Start spot instance`)
+      ec2InstanceId = await aws.startEc2SpotInstance(spotPrice)
+    }
   } else {
+    // eslint-disable-next-line i18n-text/no-en
+    core.info(`Start on-demand instance`)
     ec2InstanceId = startOnDemand(params, ghToken)
   }
 
   await ghc.waitForRunnerRegistered()
-  return ec2InstanceId
+  core.setOutput('label', params.label)
+  if (core.getInput('runner-type') === `spot`) {
+    core.setOutput('ec2-instance-id', 'none')
+    core.setOutput('runner-type', 'spot')
+  } else {
+    core.setOutput('ec2-instance-id', ec2InstanceId)
+    core.setOutput('ec2-spot-request-id', 'none')
+    core.setOutput('runner-type', 'ondemand')
+  }
 }
 
 export async function stopRunner(
@@ -66,6 +85,7 @@ async function startOnDemand(
   params: IEC2Params,
   ghToken: string | undefined
 ): Promise<string> {
+  params.runnerType = 'ondemand'
   const aws = new awsClient(params, ghToken)
   return await aws.startEc2Instance()
 }

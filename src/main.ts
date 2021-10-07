@@ -62,16 +62,7 @@ async function prepareStart(): Promise<void> {
       `Not all the required inputs are provided for the 'start' mode`
     )
   }
-  const responseID = await startRunner(ghToken, params)
-  core.setOutput('label', params.label)
-  if (core.getInput('runner-type') === `spot`) {
-    core.setOutput('ec2-instance-id', 'none')
-    core.setOutput('runner-type', 'spot')
-  } else {
-    core.setOutput('ec2-instance-id', responseID)
-    core.setOutput('ec2-spot-request-id', 'none')
-    core.setOutput('runner-type', 'ondemand')
-  }
+  await startRunner(ghToken, params)
 }
 
 async function prepeareStop(): Promise<void> {
