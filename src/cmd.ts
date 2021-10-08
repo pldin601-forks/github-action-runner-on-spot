@@ -19,25 +19,27 @@ export async function startRunner(
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const ghc = new gitHubClient(token, params.label!)
   const ghToken = await ghc.getRegistrationToken()
-
+  let runnerType: string
   let ec2InstanceId: String | undefined | Promise<string>
   if (params.runnerType === 'spot') {
+    runnerType = 'spot'
     const aws = new awsSpotClient(params, ghToken)
     const spotPrice = await aws.getSpotPrice()
     const ondemandPrice = await aws.getOnDemandPrice()
     core.info(`SpotPrice: ${spotPrice}`)
     core.info(`On-demandPrice: ${ondemandPrice}`)
-    if (parseInt(ondemandPrice) > parseInt(spotPrice)) {
+    if (parseFloat(ondemandPrice) > parseFloat(spotPrice)) {
       // eslint-disable-next-line i18n-text/no-en
       core.info(`Start on-demand instance`)
       ec2InstanceId = startOnDemand(params, ghToken)
-      params.runnerType = 'ondemand'
+      runnerType = 'ondemand'
     } else {
       // eslint-disable-next-line i18n-text/no-en
       core.info(`Start spot instance`)
       ec2InstanceId = await aws.startEc2SpotInstance(spotPrice)
     }
   } else {
+    runnerType = 'ondemand'
     // eslint-disable-next-line i18n-text/no-en
     core.info(`Start on-demand instance`)
     ec2InstanceId = startOnDemand(params, ghToken)
@@ -45,13 +47,12 @@ export async function startRunner(
 
   await ghc.waitForRunnerRegistered()
   core.setOutput('label', params.label)
-  if (core.getInput('runner-type') === `spot`) {
+  core.setOutput('runner-type', runnerType)
+  if (runnerType === `spot`) {
     core.setOutput('ec2-instance-id', 'none')
-    core.setOutput('runner-type', 'spot')
   } else {
     core.setOutput('ec2-instance-id', ec2InstanceId)
     core.setOutput('ec2-spot-request-id', 'none')
-    core.setOutput('runner-type', 'ondemand')
   }
 }
 
