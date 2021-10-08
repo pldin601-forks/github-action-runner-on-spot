@@ -28,6 +28,7 @@ export async function startRunner(
     const ondemandPrice = await aws.getOnDemandPrice()
     core.info(`SpotPrice: ${spotPrice}`)
     core.info(`On-demandPrice: ${ondemandPrice}`)
+    core.info(`runner type before price check: ${runnerType}`)
     if (parseFloat(ondemandPrice) > parseFloat(spotPrice)) {
       // eslint-disable-next-line i18n-text/no-en
       core.info(`Start on-demand instance, bc price`)
@@ -45,7 +46,8 @@ export async function startRunner(
     core.info(`Start on-demand instance, bc runner type`)
     ec2InstanceId = startOnDemand(params, ghToken)
   }
-
+  core.info(`runner type after price check: ${runnerType}`)
+  core.info(`ec2-instance-id:  ${ec2InstanceId}`)
   await ghc.waitForRunnerRegistered()
   core.setOutput('label', params.label)
   core.setOutput('runner-type', runnerType)
