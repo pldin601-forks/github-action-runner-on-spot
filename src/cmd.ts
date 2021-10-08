@@ -36,6 +36,7 @@ export async function startRunner(
     } else {
       // eslint-disable-next-line i18n-text/no-en
       core.info(`Start spot instance`)
+      runnerType = 'spot'
       ec2InstanceId = await aws.startEc2SpotInstance(spotPrice)
     }
   } else {
