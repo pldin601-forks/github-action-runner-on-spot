@@ -114,13 +114,7 @@ export class awsClient implements AWSWorker {
       'export RUNNER_ALLOW_RUNASROOT=1',
       'export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1',
       `./config.sh --url https://github.com/${this.owner}/${this.repo} --token ${this.ghToken} --labels ${this.params.label}`,
-      './run.sh &',
-      ' mkdir ../actions-runner-2',
-      'cp ./actions-runner-linux-x64-2.278.0.tar.gz ../actions-runner-2/',
-      'cd ../actions-runner-2/',
-      'tar xzf ./actions-runner-linux-${RUNNER_ARCH}-2.283.3.tar.gz',
-      './config.sh --url https://github.com/${this.owner}/${this.repo} --token ${this.ghToken} --labels ${this.params.label}',
-      './run.sh &'
+      './run.sh'
     ]
   }
 }
