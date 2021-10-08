@@ -26,10 +26,13 @@ export async function startRunner(
     const aws = new awsSpotClient(params, ghToken)
     const spotPrice = await aws.getSpotPrice()
     const ondemandPrice = await aws.getOnDemandPrice()
-    core.info(`SpotPrice: ${spotPrice}`)
-    core.info(`On-demandPrice: ${ondemandPrice}`)
+    const spotPriceInt = parseFloat(spotPrice) * 1000
+    const ondemandPriceInt = parseFloat(ondemandPrice) * 1000
+
+    core.info(`SpotPrice: ${spotPriceInt}`)
+    core.info(`On-demandPrice: ${ondemandPriceInt}`)
     core.info(`runner type before price check: ${runnerType}`)
-    if (parseFloat(ondemandPrice) > parseFloat(spotPrice)) {
+    if (ondemandPriceInt > spotPriceInt) {
       // eslint-disable-next-line i18n-text/no-en
       core.info(`Start on-demand instance, bc price`)
       ec2InstanceId = startOnDemand(params, ghToken)
@@ -44,7 +47,7 @@ export async function startRunner(
     runnerType = 'ondemand'
     // eslint-disable-next-line i18n-text/no-en
     core.info(`Start on-demand instance, bc runner type`)
-    ec2InstanceId = startOnDemand(params, ghToken)
+    ec2InstanceId = await startOnDemand(params, ghToken)
   }
   core.info(`runner type after price check: ${runnerType}`)
   core.info(`ec2-instance-id:  ${ec2InstanceId}`)
