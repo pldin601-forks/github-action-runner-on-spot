@@ -32,10 +32,10 @@ export async function startRunner(
     core.info(`SpotPrice: ${spotPriceInt}`)
     core.info(`On-demandPrice: ${ondemandPriceInt}`)
     core.info(`runner type before price check: ${runnerType}`)
-    if (ondemandPriceInt > spotPriceInt) {
+    if (spotPriceInt > ondemandPriceInt) {
       // eslint-disable-next-line i18n-text/no-en
       core.info(`Start on-demand instance, bc price`)
-      ec2InstanceId = startOnDemand(params, ghToken)
+      ec2InstanceId = await startOnDemand(params, ghToken)
       runnerType = 'ondemand'
     } else {
       // eslint-disable-next-line i18n-text/no-en
