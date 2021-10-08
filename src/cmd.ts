@@ -30,7 +30,7 @@ export async function startRunner(
     core.info(`On-demandPrice: ${ondemandPrice}`)
     if (parseFloat(ondemandPrice) > parseFloat(spotPrice)) {
       // eslint-disable-next-line i18n-text/no-en
-      core.info(`Start on-demand instance`)
+      core.info(`Start on-demand instance, bc price`)
       ec2InstanceId = startOnDemand(params, ghToken)
       runnerType = 'ondemand'
     } else {
@@ -42,7 +42,7 @@ export async function startRunner(
   } else {
     runnerType = 'ondemand'
     // eslint-disable-next-line i18n-text/no-en
-    core.info(`Start on-demand instance`)
+    core.info(`Start on-demand instance, bc runner type`)
     ec2InstanceId = startOnDemand(params, ghToken)
   }
 
