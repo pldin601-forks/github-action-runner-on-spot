@@ -20,7 +20,7 @@ export async function startRunner(
   const ghc = new gitHubClient(token, params.label!)
   const ghToken = await ghc.getRegistrationToken()
   let runnerType: string
-  let ec2InstanceId: String | undefined | Promise<string>
+  let ec2InstanceId: String | undefined
   if (params.runnerType === 'spot') {
     runnerType = 'spot'
     const aws = new awsSpotClient(params, ghToken)
