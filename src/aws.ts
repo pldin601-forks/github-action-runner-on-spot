@@ -109,11 +109,17 @@ export class awsClient implements AWSWorker {
       '#!/bin/bash',
       'mkdir actions-runner && cd actions-runner',
       'case $(uname -m) in aarch64) ARCH="arm64" ;; amd64|x86_64) ARCH="x64" ;; esac && export RUNNER_ARCH=${ARCH}',
-      'curl -O -L https://github.com/actions/runner/releases/download/v2.278.0/actions-runner-linux-${RUNNER_ARCH}-2.278.0.tar.gz',
-      'tar xzf ./actions-runner-linux-${RUNNER_ARCH}-2.278.0.tar.gz',
+      'curl -O -L https://github.com/actions/runner/releases/download/v2.283.3/actions-runner-linux-${RUNNER_ARCH}-2.283.3.tar.gz',
+      'tar xzf ./actions-runner-linux-${RUNNER_ARCH}-2.283.3.tar.gz',
       'export RUNNER_ALLOW_RUNASROOT=1',
       'export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1',
       `./config.sh --url https://github.com/${this.owner}/${this.repo} --token ${this.ghToken} --labels ${this.params.label}`,
+      './run.sh',
+      ' mkdir ../actions-runner-2',
+      'cp ./actions-runner-linux-x64-2.278.0.tar.gz ../actions-runner-2/',
+      'cd ../actions-runner-2/',
+      'tar xzf ./actions-runner-linux-${RUNNER_ARCH}-2.283.3.tar.gz',
+      './config.sh --url https://github.com/${this.owner}/${this.repo} --token ${this.ghToken} --labels ${this.params.label}',
       './run.sh'
     ]
   }
