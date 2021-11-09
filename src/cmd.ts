@@ -29,9 +29,8 @@ export async function startRunner(
     const spotPriceInt = parseFloat(spotPrice) * 1000
     const ondemandPriceInt = parseFloat(ondemandPrice) * 1000
 
-    core.info(`SpotPrice: ${spotPriceInt}`)
-    core.info(`On-demandPrice: ${ondemandPriceInt}`)
-    core.info(`runner type before price check: ${runnerType}`)
+    core.info(`SpotPrice: ${spotPrice}`)
+    core.info(`On-demandPrice: ${ondemandPrice}`)
     if (spotPriceInt > ondemandPriceInt) {
       // eslint-disable-next-line i18n-text/no-en
       core.info(`Start on-demand instance, bc price`)

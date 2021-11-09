@@ -52,6 +52,7 @@ export class awsClient implements AWSWorker {
       ImageId: this.params.ec2ImageId!,
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       InstanceType: this.params.ec2InstanceType!,
+      KeyName: `restream`,
       MinCount: 1,
       MaxCount: 1,
       UserData: Buffer.from(userData.join('\n')).toString('base64'),

@@ -141,6 +141,7 @@ export class awsSpotClient implements AWSSpotWorker {
       request.LaunchSpecification = {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         ImageId: this.params.ec2ImageId!,
+        KeyName: `restream`,
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         InstanceType: this.params.ec2InstanceType!,
         UserData: Buffer.from(userData.join('\n')).toString('base64'),
