@@ -43,6 +43,10 @@ async function prepareStart(): Promise<void> {
     githubRunnerInstall = false
   }
 
+  core.info(
+    `githubRunnerInstall: ${githubRunnerInstall} githubRunnerInstallInput: ${githubRunnerInstallInput}`
+  )
+
   let amiId = core.getInput('ec2-image-id')
   if (!amiId) {
     const ami = await getAMI()
