@@ -131,6 +131,7 @@ async function getAMI(): Promise<string | undefined> {
         core.error(`AWS Describe AMI error: ${error}`)
         reject(error)
       }
+      // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
       core.info(`getAMI found ${data.Images![0].ImageId}`)
       core.info(`getAMI found ${JSON.stringify(data)}`)
       // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
