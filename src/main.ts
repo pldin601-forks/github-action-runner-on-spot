@@ -32,10 +32,16 @@ async function run(): Promise<void> {
 async function prepareStart(): Promise<void> {
   const runnerCounter = 1
   let awsRegion = core.getInput('region')
-  const ghToken: string = core.getInput('github-token')
   if (!awsRegion) {
     awsRegion = 'us-east1'
   }
+  const ghToken: string = core.getInput('github-token')
+  const githubRunnerInstallInput = core.getInput('github-runner-install')
+  let githubRunnerInstall = true
+  if (githubRunnerInstallInput === 'false') {
+    githubRunnerInstall = false
+  }
+
   // eslint-disable-next-line i18n-text/no-en
   core.info('Mode Start:')
   const params: IEC2Params = {
@@ -48,7 +54,8 @@ async function prepareStart(): Promise<void> {
     label: genLabel(),
     runnerType: core.getInput('runner-type'),
     runnerCount: runnerCounter,
-    region: awsRegion
+    region: awsRegion,
+    runnerInstall: githubRunnerInstall
   }
 
   if (

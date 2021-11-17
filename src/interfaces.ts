@@ -15,6 +15,7 @@ export interface IEC2Params {
   runnerType?: string
   runnerCount?: number
   region?: string
+  runnerInstall?: boolean
 }
 
 interface Worker {
