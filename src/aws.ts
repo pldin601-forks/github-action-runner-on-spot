@@ -8,6 +8,7 @@ import {
   TagSpecificationList
 } from 'aws-sdk/clients/ec2'
 import AWS from 'aws-sdk'
+import { gitHubClient } from './github'
 
 export class awsClient implements AWSWorker {
   ec2: AWS.EC2
@@ -106,17 +107,28 @@ export class awsClient implements AWSWorker {
   }
 
   getUserData(): string[] {
-    return [
+    let result: string[] = [
       '#!/bin/bash',
-      'mkdir actions-runner && cd actions-runner',
-      'case $(uname -m) in aarch64) ARCH="arm64" ;; amd64|x86_64) ARCH="x64" ;; esac && export RUNNER_ARCH=${ARCH}',
-      'curl -O -L https://github.com/actions/runner/releases/download/v2.283.3/actions-runner-linux-${RUNNER_ARCH}-2.283.3.tar.gz',
-      'tar xzf ./actions-runner-linux-${RUNNER_ARCH}-2.283.3.tar.gz',
+      'cd /opt/actions-runner',
       'export RUNNER_ALLOW_RUNASROOT=1',
       'export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1',
       `./config.sh --url https://github.com/${this.owner}/${this.repo} --token ${this.ghToken} --labels ${this.params.label}`,
       './run.sh'
     ]
+    if (this.params.githubRunnerInstall === true) {
+      result = [
+        '#!/bin/bash',
+        'mkdir actions-runner && cd actions-runner',
+        'case $(uname -m) in aarch64) ARCH="arm64" ;; amd64|x86_64) ARCH="x64" ;; esac && export RUNNER_ARCH=${ARCH}',
+        'curl -O -L https://github.com/actions/runner/releases/download/v2.283.3/actions-runner-linux-${RUNNER_ARCH}-2.283.3.tar.gz',
+        'tar xzf ./actions-runner-linux-${RUNNER_ARCH}-2.283.3.tar.gz',
+        'export RUNNER_ALLOW_RUNASROOT=1',
+        'export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1',
+        `./config.sh --url https://github.com/${this.owner}/${this.repo} --token ${this.ghToken} --labels ${this.params.label}`,
+        './run.sh'
+      ]
+    }
+    return result
   }
 }
 

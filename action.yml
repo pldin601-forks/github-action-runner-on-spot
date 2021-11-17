@@ -22,6 +22,12 @@ inputs:
     description: >-
       Specify here how many instances you want.
     required: false
+  github_runner_install:
+    description: >-
+      Specify here if you want to install the runner on the instance:
+        - 'true' - to install the runner on the instance;
+        - 'false' - to not install the runner on the instance.
+    required: false
   region:
     description: >-
       Specify here aws region for runnner. Default: us-east1
