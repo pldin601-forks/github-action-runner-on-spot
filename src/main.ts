@@ -37,7 +37,7 @@ async function prepareStart(): Promise<void> {
     awsRegion = 'us-east1'
   }
   const ghToken: string = core.getInput('github-token')
-  const githubRunnerInstallInput = core.getInput('github_runner_install')
+  const githubRunnerInstallInput = core.getInput('github-runner-install')
   let githubRunnerInstall = true
   if (githubRunnerInstallInput === 'false') {
     githubRunnerInstall = false

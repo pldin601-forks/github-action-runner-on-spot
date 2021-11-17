@@ -22,7 +22,7 @@ inputs:
     description: >-
       Specify here how many instances you want.
     required: false
-  github_runner_install:
+  github-runner-install:
     description: >-
       Specify here if you want to install the runner on the instance:
         - 'true' - to install the runner on the instance;
