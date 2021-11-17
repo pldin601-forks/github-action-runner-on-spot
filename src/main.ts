@@ -51,6 +51,7 @@ async function prepareStart(): Promise<void> {
     }
     amiId = ami
   }
+  core.info(`AMI ID: ${amiId}`)
 
   // eslint-disable-next-line i18n-text/no-en
   core.info('Mode Start:')
