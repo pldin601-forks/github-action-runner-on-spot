@@ -248,6 +248,7 @@ export class awsSpotClient implements AWSSpotWorker {
   getUserData(): string[] {
     let result: string[] = [
       '#!/bin/bash',
+      'set -xe',
       'cd /opt/actions-runner',
       'export RUNNER_ALLOW_RUNASROOT=1',
       'export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1',
@@ -257,6 +258,7 @@ export class awsSpotClient implements AWSSpotWorker {
     if (this.params.runnerInstall === true) {
       result = [
         '#!/bin/bash',
+        'set -xe',
         'mkdir actions-runner && cd actions-runner',
         'case $(uname -m) in aarch64) ARCH="arm64" ;; amd64|x86_64) ARCH="x64" ;; esac && export RUNNER_ARCH=${ARCH}',
         'curl -O -L https://github.com/actions/runner/releases/download/v2.283.3/actions-runner-linux-${RUNNER_ARCH}-2.283.3.tar.gz',
