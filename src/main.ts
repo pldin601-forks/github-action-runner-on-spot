@@ -36,13 +36,10 @@ async function prepareStart(): Promise<void> {
     awsRegion = 'us-east1'
   }
   const ghToken: string = core.getInput('github-token')
-  let githubRunnerInstallInput = core.getInput('github-runner-install')
-  let githubRunnerInstall: boolean = true
-  if (githubRunnerInstallInput === "false") {
+  const githubRunnerInstallInput = core.getInput('github-runner-install')
+  let githubRunnerInstall = true
+  if (githubRunnerInstallInput === 'false') {
     githubRunnerInstall = false
-  }
-  if (githubRunnerInstallInput === "true") {
-    githubRunnerInstall = true
   }
 
   // eslint-disable-next-line i18n-text/no-en
@@ -58,7 +55,7 @@ async function prepareStart(): Promise<void> {
     runnerType: core.getInput('runner-type'),
     runnerCount: runnerCounter,
     region: awsRegion,
-    githubRunnerInstall: githubRunnerInstall,
+    runnerInstall: githubRunnerInstall
   }
 
   if (

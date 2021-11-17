@@ -8,7 +8,6 @@ import {
   TagSpecificationList
 } from 'aws-sdk/clients/ec2'
 import AWS from 'aws-sdk'
-import { gitHubClient } from './github'
 
 export class awsClient implements AWSWorker {
   ec2: AWS.EC2
@@ -115,7 +114,7 @@ export class awsClient implements AWSWorker {
       `./config.sh --url https://github.com/${this.owner}/${this.repo} --token ${this.ghToken} --labels ${this.params.label}`,
       './run.sh'
     ]
-    if (this.params.githubRunnerInstall === true) {
+    if (this.params.runnerInstall === true) {
       result = [
         '#!/bin/bash',
         'mkdir actions-runner && cd actions-runner',

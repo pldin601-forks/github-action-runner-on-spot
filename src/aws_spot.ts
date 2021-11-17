@@ -254,7 +254,7 @@ export class awsSpotClient implements AWSSpotWorker {
       `./config.sh --url https://github.com/${this.owner}/${this.repo} --token ${this.ghToken} --labels ${this.params.label}`,
       './run.sh'
     ]
-    if (this.params.githubRunnerInstall === true) {
+    if (this.params.runnerInstall === true) {
       result = [
         '#!/bin/bash',
         'mkdir actions-runner && cd actions-runner',
