@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import { genLabel, startRunner, stopRunner } from './cmd'
+import AWS from 'aws-sdk'
 import { IEC2Params } from './interfaces'
 
 async function run(): Promise<void> {
@@ -40,6 +41,15 @@ async function prepareStart(): Promise<void> {
   let githubRunnerInstall = true
   if (githubRunnerInstallInput === 'false') {
     githubRunnerInstall = false
+  }
+
+  let amiId = core.getInput('ec2-image-id')
+  if (!amiId) {
+    const ami = await getAMI()
+    if (!ami) {
+      throw new Error(`No AMI found`)
+    }
+    amiId = ami
   }
 
   // eslint-disable-next-line i18n-text/no-en
@@ -98,6 +108,33 @@ async function prepeareStop(): Promise<void> {
     )
   }
   await stopRunner(ghToken, label, requestId, spot)
+}
+
+async function getAMI(): Promise<string | undefined> {
+  const ec2 = new AWS.EC2()
+
+  return await new Promise((resolve, reject) => {
+    const params = {
+      DryRun: false,
+      Filters: [
+        {
+          Name: 'name',
+          Values: ['github-actions-runner/ubuntu-20.04-latest']
+        }
+      ],
+      IncludeDeprecated: false,
+      Owners: ['318522186253'] //Restream
+    }
+    ec2.describeImages(params, function (error, data) {
+      if (error) {
+        core.error(`AWS Describe AMI error: ${error}`)
+        reject(error)
+      }
+      core.info('getAMI found ${data.Images![0].ImageId}')
+      // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
+      resolve(data.Images![0].ImageId)
+    })
+  })
 }
 
 run()
