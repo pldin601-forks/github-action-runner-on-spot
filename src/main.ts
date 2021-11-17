@@ -56,7 +56,7 @@ async function prepareStart(): Promise<void> {
   // eslint-disable-next-line i18n-text/no-en
   core.info('Mode Start:')
   const params: IEC2Params = {
-    ec2ImageId: core.getInput('ec2-image-id'),
+    ec2ImageId: amiId,
     ec2InstanceType: core.getInput('ec2-instance-type'),
     subnetId: core.getInput('subnet-id'),
     securityGroupId: core.getInput('security-group-id'),
@@ -131,9 +131,8 @@ async function getAMI(): Promise<string | undefined> {
         core.error(`AWS Describe AMI error: ${error}`)
         reject(error)
       }
-      // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
-      core.info(`getAMI found ${data.Images![0].ImageId}`)
-      core.info(`getAMI found ${JSON.stringify(data)}`)
+
+      core.debug(`getAMI found ${JSON.stringify(data)}`)
       // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
       resolve(data.Images![0].ImageId)
     })
