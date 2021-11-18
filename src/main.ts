@@ -37,15 +37,8 @@ async function prepareStart(): Promise<void> {
     awsRegion = 'us-east1'
   }
   const ghToken: string = core.getInput('github-token')
-  const githubRunnerInstallInput = core.getInput('github-runner-install')
-  let githubRunnerInstall = true
-  if (githubRunnerInstallInput === 'false') {
-    githubRunnerInstall = false
-  }
 
-  core.info(
-    `githubRunnerInstall: ${githubRunnerInstall} githubRunnerInstallInput: ${githubRunnerInstallInput}`
-  )
+  let githubRunnerInstall = true
 
   let amiId = core.getInput('ec2-image-id')
   if (!amiId) {
@@ -54,8 +47,20 @@ async function prepareStart(): Promise<void> {
       throw new Error(`No AMI found`)
     }
     amiId = ami
+    githubRunnerInstall = false
   }
   core.info(`AMI ID: ${amiId}`)
+
+  const githubRunnerInstallInput = core.getInput('github-runner-install')
+  if (githubRunnerInstallInput === 'false') {
+    githubRunnerInstall = false
+  }
+  if (githubRunnerInstallInput === 'true') {
+    githubRunnerInstall = true
+  }
+  core.info(
+    `githubRunnerInstall: ${githubRunnerInstall} githubRunnerInstallInput: ${githubRunnerInstallInput}`
+  )
 
   // eslint-disable-next-line i18n-text/no-en
   core.info('Mode Start:')
