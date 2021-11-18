@@ -40,8 +40,12 @@ async function prepareStart(): Promise<void> {
 
   let githubRunnerInstall = true
 
-  let amiId = core.getInput('ec2-image-id')
-  if (!amiId) {
+  let amiId: string | undefined = core.getInput('ec2-image-id')
+  const regexAmiId = /^ami-.*$/g
+  amiId = amiId.trim().replace(/\s/g, '')
+  amiId = amiId.length !== 0 && regexAmiId.test(amiId) ? amiId : undefined
+  if (amiId === undefined) {
+    core.info(`AMI ID is undefined`)
     const ami = await getAMI()
     if (!ami) {
       throw new Error(`No AMI found`)
